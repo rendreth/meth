@@ -15,7 +15,74 @@
         </div>
     </header>
     <div class="content">
-        <h1>cooking<span class="blink">.</span></h1>
+        <h1><span id="typewriter-text"></span><span id="cursor" class="blink">.</span></h1>
     </div>
+
+    <script>
+        // Set messages here, order is important
+        const messages = [
+            "Secure your cook",
+            "Build your lab",
+            "Sell your product",
+            "We're cooking"
+        ];
+        
+        let currentMessageIndex = 0;
+        let currentCharIndex = 0;
+        let isTyping = true;
+        let isDeleting = false;
+
+        // Speed settings
+        let initialPause = 1000;
+        let typingSpeed = 100;
+        let deletingSpeed = 50;
+        let pauseBeforeDeleting = 2000; 
+        let pauseBeforeTyping = 500;   
+        
+        const typewriterElement = document.getElementById('typewriter-text');
+        const cursorElement = document.getElementById('cursor');
+        
+        function typeWriter() {
+            const currentMessage = messages[currentMessageIndex];
+            
+            if (isTyping && !isDeleting) {
+                // Typing phase
+                if (currentCharIndex < currentMessage.length) {
+                    typewriterElement.textContent = currentMessage.substring(0, currentCharIndex + 1);
+                    currentCharIndex++;
+                    setTimeout(typeWriter, typingSpeed); // Typing speed
+                } else {
+                    // Finished typing, wait then start deleting (except for last message)
+                    if (currentMessageIndex === messages.length - 1) {
+                        // Last message - stop here and show blinking cursor
+                        cursorElement.style.display = 'inline';
+                        return;
+                    }
+                    setTimeout(() => {
+                        isDeleting = true;
+                        typeWriter();
+                    }, pauseBeforeDeleting); // Pause before deleting
+                }
+            } else if (isDeleting) {
+                // Deleting phase
+                if (currentCharIndex > 0) {
+                    typewriterElement.textContent = currentMessage.substring(0, currentCharIndex - 1);
+                    currentCharIndex--;
+                    setTimeout(typeWriter, deletingSpeed); // Deleting speed (faster)
+                } else {
+                    // Finished deleting, move to next message
+                    isDeleting = false;
+                    currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+                    setTimeout(typeWriter, pauseBeforeTyping); // Pause before next message
+                }
+            }
+        }
+        
+        // Start the typewriter effect when page loads
+        window.addEventListener('load', () => {
+            cursorElement.style.display = 'none'; // Hide cursor initially
+            setTimeout(typeWriter, initialPause); // Start after 1 second
+        });
+    </script>
 </body>
 </html>
